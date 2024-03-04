@@ -21,7 +21,7 @@ android {
 }
 
 dependencies {
-    implementation(projects.core)
+    implementation(projects.core.common)
     implementation(projects.domain)
     implementation(projects.presentationCore)
     api(projects.i18n)
@@ -34,5 +34,9 @@ dependencies {
     implementation(platform(libs.coil.bom))
     implementation(libs.coil.core)
 
+    // SY -->
+    implementation(libs.material)
+    // SY <--
+    
     api(libs.injekt.core)
 }

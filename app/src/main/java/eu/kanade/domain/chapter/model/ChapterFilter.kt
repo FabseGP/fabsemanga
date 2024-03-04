@@ -34,7 +34,8 @@ fun List<Chapter>.applyFilters(
                 val downloaded = downloadManager.isChapterDownloaded(
                     chapter.name,
                     chapter.scanlator,
-                    /* SY --> */ manga.ogTitle /* SY <-- */,
+                    /* SY --> */
+                    manga.ogTitle /* SY <-- */,
                     manga.source,
                 )
                 downloaded || isLocalManga

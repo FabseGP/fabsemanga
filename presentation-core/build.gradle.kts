@@ -21,9 +21,9 @@ android {
 }
 
 dependencies {
-    api(projects.core)
+    api(projects.core.common)
     api(projects.i18n)
-    api(project(":i18n-sy"))
+    api(projects.i18nSy)
 
     // Compose
     implementation(platform(compose.bom))
@@ -53,7 +53,7 @@ tasks {
             "-opt-in=androidx.compose.foundation.ExperimentalFoundationApi",
             "-opt-in=androidx.compose.animation.ExperimentalAnimationApi",
             "-opt-in=androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi",
-            "-opt-in=coil.annotation.ExperimentalCoilApi",
+            "-opt-in=coil3.annotation.ExperimentalCoilApi",
             "-opt-in=kotlinx.coroutines.FlowPreview",
         )
     }

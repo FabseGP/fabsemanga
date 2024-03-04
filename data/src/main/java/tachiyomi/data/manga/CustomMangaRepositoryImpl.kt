@@ -42,6 +42,7 @@ class CustomMangaRepositoryImpl(context: Context) : CustomMangaRepository {
             mangaInfo.title == null &&
             mangaInfo.author == null &&
             mangaInfo.artist == null &&
+            mangaInfo.thumbnailUrl == null &&
             mangaInfo.description == null &&
             mangaInfo.genre == null &&
             mangaInfo.status == null
@@ -72,6 +73,7 @@ class CustomMangaRepositoryImpl(context: Context) : CustomMangaRepository {
         val title: String? = null,
         val author: String? = null,
         val artist: String? = null,
+        val thumbnailUrl: String? = null,
         val description: String? = null,
         val genre: List<String>? = null,
         val status: Long? = null,
@@ -94,6 +96,7 @@ class CustomMangaRepositoryImpl(context: Context) : CustomMangaRepository {
             title,
             author,
             artist,
+            thumbnailUrl,
             description,
             genre,
             status,

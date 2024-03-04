@@ -9,7 +9,7 @@ steps:
       - echo "storePassword=$${KEYSTOREPASS}\nkeyPassword=$${KEYPASS}\nkeyAlias=$${ALIAS}\nstoreFile=release-key.jks" > keystore.properties
       - echo "$${SIGNING_KEY}" | base64 -d > app/release-key.jks
       - ./gradlew detekt assembleStandardRelease testStandardReleaseUnitTest
-      - mv app/build/outputs/apk/standard/release/app-standard-universal-release.apk fabsemanga-${CI_COMMIT_TAG}.apk
+      - mv app/build/outputs/apk/standard/release/app-standard-universal-release.apk fabsemanga-universal-${CI_COMMIT_TAG}.apk
       - mv app/build/outputs/apk/standard/release/app-standard-arm64-v8a-release.apk fabsemanga-arm64-v8a-${CI_COMMIT_TAG}.apk
       - mv app/build/outputs/apk/standard/release/app-standard-x86_64-release.apk fabsemanga-x86_64-${CI_COMMIT_TAG}.apk
     secrets: [ keystorepass, keypass, alias, signing_key ]
@@ -19,7 +19,7 @@ steps:
       base_url: https://codeberg.org
       file_exists: overwrite
       files:
-        - "fabsemanga-${CI_COMMIT_TAG}.apk"
+        - "fabsemanga-universal-${CI_COMMIT_TAG}.apk"
         - "fabsemanga-arm64-v8a-${CI_COMMIT_TAG}.apk"
         - "fabsemanga-x86_64-${CI_COMMIT_TAG}.apk"
       checksum: sha256

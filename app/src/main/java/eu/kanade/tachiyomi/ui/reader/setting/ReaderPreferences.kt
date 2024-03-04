@@ -4,8 +4,8 @@ import android.os.Build
 import androidx.compose.ui.graphics.BlendMode
 import dev.icerock.moko.resources.StringResource
 import eu.kanade.tachiyomi.ui.reader.viewer.pager.PagerConfig
-import tachiyomi.core.preference.PreferenceStore
-import tachiyomi.core.preference.getEnum
+import tachiyomi.core.common.preference.PreferenceStore
+import tachiyomi.core.common.preference.getEnum
 import tachiyomi.i18n.MR
 import tachiyomi.i18n.sy.SYMR
 
@@ -77,6 +77,8 @@ class ReaderPreferences(
     fun skipFiltered() = preferenceStore.getBoolean("skip_filtered", true)
 
     fun skipDupe() = preferenceStore.getBoolean("skip_dupe", false)
+
+    fun webtoonDisableZoomOut() = preferenceStore.getBoolean("webtoon_disable_zoom_out", false)
 
     // endregion
 
@@ -160,8 +162,6 @@ class ReaderPreferences(
 
     fun useAutoWebtoon() = preferenceStore.getBoolean("eh_use_auto_webtoon", true)
 
-    fun webtoonEnableZoomOut() = preferenceStore.getBoolean("webtoon_enable_zoom_out", false)
-
     fun continuousVerticalTappingByPage() = preferenceStore.getBoolean("continuous_vertical_tapping_by_page", false)
 
     fun cropBordersContinuousVertical() = preferenceStore.getBoolean("crop_borders_continues_vertical", false)
@@ -172,7 +172,10 @@ class ReaderPreferences(
 
     fun leftVerticalSeekbar() = preferenceStore.getBoolean("pref_left_handed_vertical_seekbar", false)
 
-    fun readerBottomButtons() = preferenceStore.getStringSet("reader_bottom_buttons", ReaderBottomButton.BUTTONS_DEFAULTS)
+    fun readerBottomButtons() = preferenceStore.getStringSet(
+        "reader_bottom_buttons",
+        ReaderBottomButton.BUTTONS_DEFAULTS
+    )
 
     fun pageLayout() = preferenceStore.getInt("page_layout", PagerConfig.PageLayout.AUTOMATIC)
 
@@ -181,6 +184,9 @@ class ReaderPreferences(
     fun centerMarginType() = preferenceStore.getInt("center_margin_type", PagerConfig.CenterMarginType.NONE)
 
     fun cacheArchiveMangaOnDisk() = preferenceStore.getBoolean("cache_archive_manga_on_disk", false)
+
+    fun markReadDupe() = preferenceStore.getBoolean("mark_read_dupe", false)
+
     // SY <--
 
     enum class TappingInvertMode(

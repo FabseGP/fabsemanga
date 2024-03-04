@@ -94,7 +94,9 @@ class DownloadJob(context: Context, workerParams: WorkerParameters) : CoroutineW
             }
             !noWifi
         } else {
-            downloadManager.downloaderStop(applicationContext.getString(tachiyomi.i18n.R.string.download_notifier_no_network))
+            downloadManager.downloaderStop(
+                applicationContext.getString(tachiyomi.i18n.R.string.download_notifier_no_network)
+            )
             false
         }
     }

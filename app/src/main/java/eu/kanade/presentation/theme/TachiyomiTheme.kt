@@ -8,6 +8,7 @@ import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.ui.platform.LocalContext
 import eu.kanade.domain.ui.UiPreferences
 import eu.kanade.domain.ui.model.AppTheme
+import eu.kanade.presentation.theme.colorscheme.BaseColorScheme
 import eu.kanade.presentation.theme.colorscheme.GreenAppleColorScheme
 import eu.kanade.presentation.theme.colorscheme.LavenderColorScheme
 import eu.kanade.presentation.theme.colorscheme.MidnightDuskColorScheme
@@ -29,8 +30,29 @@ fun TachiyomiTheme(
     amoled: Boolean? = null,
     content: @Composable () -> Unit,
 ) {
+    val uiPreferences = Injekt.get<UiPreferences>()
+    BaseTachiyomiTheme(
+        appTheme = appTheme ?: uiPreferences.appTheme().get(),
+        isAmoled = amoled ?: uiPreferences.themeDarkAmoled().get(),
+        content = content,
+    )
+}
+
+@Composable
+fun TachiyomiPreviewTheme(
+    appTheme: AppTheme = AppTheme.DEFAULT,
+    isAmoled: Boolean = false,
+    content: @Composable () -> Unit,
+) = BaseTachiyomiTheme(appTheme, isAmoled, content)
+
+@Composable
+private fun BaseTachiyomiTheme(
+    appTheme: AppTheme,
+    isAmoled: Boolean,
+    content: @Composable () -> Unit,
+) {
     MaterialTheme(
-        colorScheme = getThemeColorScheme(appTheme, amoled),
+        colorScheme = getThemeColorScheme(appTheme, isAmoled),
         content = content,
     )
 }
@@ -38,27 +60,30 @@ fun TachiyomiTheme(
 @Composable
 @ReadOnlyComposable
 private fun getThemeColorScheme(
-    appTheme: AppTheme?,
-    amoled: Boolean?,
+    appTheme: AppTheme,
+    isAmoled: Boolean,
 ): ColorScheme {
-    val uiPreferences = Injekt.get<UiPreferences>()
-    val colorScheme = when (appTheme ?: uiPreferences.appTheme().get()) {
-        AppTheme.DEFAULT -> TachiyomiColorScheme
-        AppTheme.MONET -> MonetColorScheme(LocalContext.current)
-        AppTheme.GREEN_APPLE -> GreenAppleColorScheme
-        AppTheme.LAVENDER -> LavenderColorScheme
-        AppTheme.MIDNIGHT_DUSK -> MidnightDuskColorScheme
-        AppTheme.NORD -> NordColorScheme
-        AppTheme.STRAWBERRY_DAIQUIRI -> StrawberryColorScheme
-        AppTheme.TAKO -> TakoColorScheme
-        AppTheme.TEALTURQUOISE -> TealTurqoiseColorScheme
-        AppTheme.TIDAL_WAVE -> TidalWaveColorScheme
-        AppTheme.YINYANG -> YinYangColorScheme
-        AppTheme.YOTSUBA -> YotsubaColorScheme
-        else -> TachiyomiColorScheme
+    val colorScheme = if (appTheme == AppTheme.MONET) {
+        MonetColorScheme(LocalContext.current)
+    } else {
+        colorSchemes.getOrDefault(appTheme, TachiyomiColorScheme)
     }
     return colorScheme.getColorScheme(
         isSystemInDarkTheme(),
-        amoled ?: uiPreferences.themeDarkAmoled().get(),
+        isAmoled,
     )
 }
+
+private val colorSchemes: Map<AppTheme, BaseColorScheme> = mapOf(
+    AppTheme.DEFAULT to TachiyomiColorScheme,
+    AppTheme.GREEN_APPLE to GreenAppleColorScheme,
+    AppTheme.LAVENDER to LavenderColorScheme,
+    AppTheme.MIDNIGHT_DUSK to MidnightDuskColorScheme,
+    AppTheme.NORD to NordColorScheme,
+    AppTheme.STRAWBERRY_DAIQUIRI to StrawberryColorScheme,
+    AppTheme.TAKO to TakoColorScheme,
+    AppTheme.TEALTURQUOISE to TealTurqoiseColorScheme,
+    AppTheme.TIDAL_WAVE to TidalWaveColorScheme,
+    AppTheme.YINYANG to YinYangColorScheme,
+    AppTheme.YOTSUBA to YotsubaColorScheme,
+)

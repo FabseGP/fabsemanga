@@ -1,4 +1,4 @@
-package tachiyomi.core.metadata.comicinfo
+package tachiyomi.core.common.metadata.comicinfo
 
 import eu.kanade.tachiyomi.source.model.SManga
 import kotlinx.serialization.Serializable
@@ -27,6 +27,7 @@ fun SManga.getComicInfo() = ComicInfo(
     coverArtist = null,
     tags = null,
     categories = null,
+    source = null,
     padding = null,
 )
 
@@ -82,6 +83,7 @@ data class ComicInfo(
     val web: Web?,
     val publishingStatus: PublishingStatusTachiyomi?,
     val categories: CategoriesTachiyomi?,
+    val source: SourceMihon?,
     // SY -->
     val padding: PaddingTachiyomiSY?,
     // SY <--
@@ -158,6 +160,10 @@ data class ComicInfo(
     @Serializable
     @XmlSerialName("Categories", "http://www.w3.org/2001/XMLSchema", "ty")
     data class CategoriesTachiyomi(@XmlValue(true) val value: String = "")
+
+    @Serializable
+    @XmlSerialName("SourceMihon", "http://www.w3.org/2001/XMLSchema", "mh")
+    data class SourceMihon(@XmlValue(true) val value: String = "")
 
     // SY -->
     @Serializable

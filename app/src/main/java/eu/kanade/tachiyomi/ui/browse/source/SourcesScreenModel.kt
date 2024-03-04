@@ -30,7 +30,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import logcat.LogPriority
-import tachiyomi.core.util.system.logcat
+import tachiyomi.core.common.util.system.logcat
 import tachiyomi.domain.source.model.Pin
 import tachiyomi.domain.source.model.Source
 import uy.kohesive.injekt.Injekt
@@ -119,7 +119,10 @@ class SourcesScreenModel(
                 items = byLang
                     .flatMap {
                         listOf(
-                            SourceUiModel.Header(it.key.removePrefix(CATEGORY_KEY_PREFIX), it.value.firstOrNull()?.category != null),
+                            SourceUiModel.Header(
+                                it.key.removePrefix(CATEGORY_KEY_PREFIX),
+                                it.value.firstOrNull()?.category != null
+                            ),
                             *it.value.map { source ->
                                 SourceUiModel.Item(source)
                             }.toTypedArray(),

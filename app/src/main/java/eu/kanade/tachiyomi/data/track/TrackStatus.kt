@@ -20,11 +20,10 @@ enum class TrackStatus(val int: Int, val res: StringResource) {
     ;
 
     companion object {
-        fun parseTrackerStatus(trackerManager: TrackerManager, tracker: Long, statusLong: Long): TrackStatus? {
-            val status = statusLong.toInt()
+        fun parseTrackerStatus(trackerManager: TrackerManager, tracker: Long, status: Long): TrackStatus? {
             return when (tracker) {
                 trackerManager.mdList.id -> {
-                    when (FollowStatus.fromInt(status)) {
+                    when (FollowStatus.fromLong(status)) {
                         FollowStatus.UNFOLLOWED -> null
                         FollowStatus.READING -> READING
                         FollowStatus.COMPLETED -> COMPLETED

@@ -10,7 +10,7 @@ kotlin {
             dependencies {
                 implementation(projects.sourceApi)
                 api(projects.i18n)
-                api(project(":i18n-sy"))
+                api(projects.i18nSy)
 
                 implementation(libs.unifile)
                 // SY -->
@@ -20,7 +20,7 @@ kotlin {
         }
         val androidMain by getting {
             dependencies {
-                implementation(projects.core)
+                implementation(projects.core.common)
                 implementation(projects.coreMetadata)
 
                 // Move ChapterRecognition to separate module?

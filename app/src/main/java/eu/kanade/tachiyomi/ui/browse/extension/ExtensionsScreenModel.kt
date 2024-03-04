@@ -27,7 +27,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
-import tachiyomi.core.util.lang.launchIO
+import tachiyomi.core.common.util.lang.launchIO
 import tachiyomi.i18n.MR
 import uy.kohesive.injekt.Injekt
 import uy.kohesive.injekt.api.get
@@ -129,15 +129,6 @@ class ExtensionsScreenModel(
         basePreferences.extensionInstaller().changes()
             .onEach { mutableState.update { state -> state.copy(installer = it) } }
             .launchIn(screenModelScope)
-
-        // SY -->
-        preferences.extensionRepos()
-            .changes()
-            .onEach { repos ->
-                mutableState.update { it.copy(hasExtensionRepos = repos.isNotEmpty()) }
-            }
-            .launchIn(screenModelScope)
-        // SY <--
     }
 
     fun search(query: String?) {
@@ -215,9 +206,6 @@ class ExtensionsScreenModel(
         val updates: Int = 0,
         val installer: BasePreferences.ExtensionInstaller? = null,
         val searchQuery: String? = null,
-        // SY -->
-        val hasExtensionRepos: Boolean = false,
-        // SY <--
     ) {
         val isEmpty = items.isEmpty()
     }

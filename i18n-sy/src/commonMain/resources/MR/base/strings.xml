@@ -168,6 +168,7 @@
     <string name="put_recommends_in_overflow_summary">Put the recommendations button in the overflow menu instead of on the entry page</string>
     <string name="put_merge_in_overflow">Merge in overflow</string>
     <string name="put_merge_in_overflow_summary">Put the merge button in the overflow menu instead of on the entry page</string>
+    <string name="pref_previews_row_count">Previews row count</string>
 
     <!-- Appearance Settings -->
     <string name="pref_category_navbar">Navbar</string>
@@ -184,6 +185,7 @@
     <string name="library_group_updates_all">Launch category updates all the time</string>
 
     <!-- Browse settings -->
+    <string name="pref_hide_feed">Hide Feed tab</string>
     <string name="pref_feed_position">Feed tab position</string>
     <string name="pref_feed_position_summery">Do you want the feed tab to be the first tab in browse? This will make it the default tab when opening browse, not recommended if you\'re on data or a metered network</string>
     <string name="pref_source_source_filtering">Filter sources in categories</string>
@@ -342,6 +344,7 @@
     <string name="description_hint">Description: %1$s</string>
     <string name="author_hint">Author: %1$s</string>
     <string name="artist_hint">Artist: %1$s</string>
+    <string name="thumbnail_url_hint">Thumbnail Url: %1$s</string>
 
     <!-- Browse -->
     <!-- Sources Tab -->
@@ -391,7 +394,7 @@
     <!-- Extension section -->
     <string name="ext_redundant">Redundant</string>
     <string name="redundant_extension_message">This extension is redundant and will not be used inside this version of Fabsemanga.</string>
-    <string name="no_repos_found">No extension repositories found, please add some under More → Extension repos!</string>
+    <string name="no_repos_found">No extension repositories found, please add some under More -> Extension repos!</string>
 
     <!-- Migration -->
     <string name="select_sources">Select sources</string>

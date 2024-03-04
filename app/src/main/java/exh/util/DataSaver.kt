@@ -8,7 +8,7 @@ import eu.kanade.tachiyomi.source.Source
 import eu.kanade.tachiyomi.source.model.Page
 import eu.kanade.tachiyomi.source.online.HttpSource
 import okhttp3.Response
-import tachiyomi.core.preference.Preference
+import tachiyomi.core.common.preference.Preference
 
 interface DataSaver {
 
@@ -58,7 +58,13 @@ private class BandwidthHeroDataSaver(preferences: SourcePreferences) : DataSaver
     override fun compress(imageUrl: String): String {
         return if (dataSavedServer.isNotBlank() && !imageUrl.contains(dataSavedServer)) {
             when {
-                imageUrl.contains(".jpeg", true) || imageUrl.contains(".jpg", true) -> if (ignoreJpg) imageUrl else getUrl(imageUrl)
+                imageUrl.contains(".jpeg", true) || imageUrl.contains(".jpg", true) -> if (ignoreJpg) {
+                    imageUrl
+                } else {
+                    getUrl(
+                        imageUrl
+                    )
+                }
                 imageUrl.contains(".gif", true) -> if (ignoreGif) imageUrl else getUrl(imageUrl)
                 else -> getUrl(imageUrl)
             }
@@ -84,7 +90,13 @@ private class WsrvNlDataSaver(preferences: SourcePreferences) : DataSaver {
 
     override fun compress(imageUrl: String): String {
         return when {
-            imageUrl.contains(".jpeg", true) || imageUrl.contains(".jpg", true) -> if (ignoreJpg) imageUrl else getUrl(imageUrl)
+            imageUrl.contains(".jpeg", true) || imageUrl.contains(".jpg", true) -> if (ignoreJpg) {
+                imageUrl
+            } else {
+                getUrl(
+                    imageUrl
+                )
+            }
             imageUrl.contains(".gif", true) -> if (ignoreGif) imageUrl else getUrl(imageUrl)
             else -> getUrl(imageUrl)
         }

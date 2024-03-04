@@ -1,25 +1,34 @@
-| Preview Builds | Release Builds |
-|-------|----------|
-| [![Preview](https://ci.codeberg.org/api/badges/13004/status.svg)](https://codeberg.org/fabseman/fabsemangapreview/releases) | [![stable release](https://ci.codeberg.org/api/badges/12999/status.svg)](https://codeberg.org/fabseman/fabsemanga/releases) |
+<div align="center">
 
-# ![app icon](./.forgejo/readme-images/app-icon.png)Fabsemanga
+<a href="https://fabsemanga.fabseman.space">
+	<img src="./.forgejo/readme-images/app-icon.png" alt="Fabsemanga logo" title="Fabsemanga logo" width="80"/>
+</a>
+
+# Fabsemanga
+
+[![CI](https://ci.codeberg.org/api/badges/12999/status.svg)](https://codeberg.org/fabseman/fabsemanga/releases)
+
 Fabsemanga is a free and open source manga reader for Android 6.0 and above. Based on the og manga lord and its fork, namely [TachiyomiSY](https://github.com/jobobby04/TachiyomiSY).
 
 ![screenshots of app](./.forgejo/readme-images/screens.png)
 
+## Download
+
+Get the app from our [releases page](https://codeberg.org/fabseman/fabsemanga/releases).
+
+*Requires Android 11.0 or higher.*
+
 ## Features
 
-Features of Mihon(original) include:
-* Online reading from a variety of sources
-* Local reading of downloaded content
-* A configurable reader with multiple viewers, reading directions and other settings.
-* Tracker support: [MyAnimeList](https://myanimelist.net/), [AniList](https://anilist.co/) and [Kitsu](https://kitsu.io/) support
-* Categories to organize your library
-* Light and dark themes
-* Schedule updating your library for new chapters
-* Create backups locally to read offline or to your desired cloud service
+<div align="left">
 
-Features of Fabsemanga include:
+* Local reading of content.
+* A configurable reader with multiple viewers, reading directions and other settings.
+* Tracker support: [MyAnimeList](https://myanimelist.net/), [AniList](https://anilist.co/) and [Kitsu](https://kitsu.io/) support.
+* Categories to organize your library.
+* Light and dark themes.
+* Schedule updating your library for new chapters.
+* Create backups locally to read offline or to your desired cloud service.
 * Latest tab, store up to 5 sources where you can easily view the latest manga by viewing the tab
 * Automatic webtoon detection, allowing the reader to switch to webtoon mode automatically when viewing one
 * Manga recommendations, uses MAL and Anilist, as well as Neko Similar Manga for Mangadex manga
@@ -52,50 +61,15 @@ Features of Fabsemanga include:
 Additional features for some extensions, features include custom description, opening in app and a bunch of other things based on the source:
 * Mangadex
 
-## Download
-Get the app from our [releases page](https://codeberg.org/fabseman/fabsemanga/releases).
+</div>
 
-If you want to try new features before they get to the stable release, you can download the preview version [here](https://codeberg.org/fabseman/fabsemangapreview/releases).
+## Contributing
 
-## Issues, Feature Requests and Contributing
+[Code of conduct](./CODE_OF_CONDUCT.md) · [Contributing guide](./CONTRIBUTING.md)
 
-Please make sure to read the full guidelines. Your issue may be closed without warning if you do not.
+Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
 
-<details><summary>Issues</summary>
-
-1. **Before reporting a new issue, take a look at the [changelog](https://codeberg.org/fabseman/fabsemanga/releases) and the already opened [issues](https://codeberg.org/fabseman/fabsemanga/issues).**
-
-</details>
-
-<details><summary>Bugs</summary>
-
-* Include version (More → About → Version)
-* If not latest, try updating, it may have already been solved
-* Preview version is equal to the number of commits as seen on the main page
-* Include steps to reproduce (if not obvious from description)
-* Include screenshot (if needed)
-* If it could be device-dependent, try reproducing on another device (if possible)
-* Don't group unrelated requests into one issue
-
-</details>
-
-<details><summary>Feature Requests</summary>
-
-* Write a detailed issue, explaining what it should do or how. Avoid writing just "like X app does"
-* Include screenshot (if needed)
-
-Source requests are not accepted.
-</details>
-
-<details><summary>Contributing</summary>
-
-See [CONTRIBUTING.md](./CONTRIBUTING.md).
-</details>
-
-<details><summary>Code of Conduct</summary>
-
-See [CODE_OF_CONDUCT.md](./CODE_OF_CONDUCT.md).
-</details>
+**Before reporting a new issue, take a look at the [changelog](https://codeberg.org/fabseman/fabsemanga/releases) and the already opened [issues](https://codeberg.org/fabseman/fabsemanga/issues).**
 
 ### Disclaimer
 

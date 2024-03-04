@@ -11,7 +11,7 @@ import exh.source.EXH_SOURCE_ID
 import okhttp3.FormBody
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import tachiyomi.core.i18n.stringResource
+import tachiyomi.core.common.i18n.stringResource
 import tachiyomi.domain.UnsortedPreferences
 import tachiyomi.domain.source.service.SourceManager
 import tachiyomi.i18n.sy.SYMR
@@ -109,7 +109,9 @@ class EHConfigurator(val context: Context) {
 
         // No profile slots left :(
         if (availableProfiles.isEmpty()) {
-            throw IllegalStateException(context.stringResource(SYMR.strings.eh_settings_out_of_slots_error, source.name))
+            throw IllegalStateException(
+                context.stringResource(SYMR.strings.eh_settings_out_of_slots_error, source.name)
+            )
         }
         // Create profile in available slot
 

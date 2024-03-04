@@ -73,10 +73,8 @@ import eu.kanade.tachiyomi.ui.manga.ChapterList
 import eu.kanade.tachiyomi.ui.manga.MangaScreenModel
 import eu.kanade.tachiyomi.ui.manga.PagePreviewState
 import eu.kanade.tachiyomi.util.system.copyToClipboard
-import exh.metadata.MetadataUtil
 import exh.source.MERGED_SOURCE_ID
 import exh.source.getMainSource
-import exh.source.isEhBasedManga
 import exh.ui.metadata.adapters.MangaDexDescription
 import tachiyomi.domain.chapter.model.Chapter
 import tachiyomi.domain.chapter.service.missingChaptersCount
@@ -94,7 +92,6 @@ import tachiyomi.presentation.core.util.isScrolledToEnd
 import tachiyomi.presentation.core.util.isScrollingUp
 import tachiyomi.source.local.isLocal
 import java.time.Instant
-import java.util.Date
 
 @Composable
 fun MangaScreen(
@@ -138,6 +135,7 @@ fun MangaScreen(
     onMergeWithAnotherClicked: () -> Unit,
     onOpenPagePreview: (Int) -> Unit,
     onMorePreviewsClicked: () -> Unit,
+    previewsRowCount: Int,
     // SY <--
 
     // For bottom action menu
@@ -196,6 +194,7 @@ fun MangaScreen(
             onMergeWithAnotherClicked = onMergeWithAnotherClicked,
             onOpenPagePreview = onOpenPagePreview,
             onMorePreviewsClicked = onMorePreviewsClicked,
+            previewsRowCount = previewsRowCount,
             // SY <--
             onMultiBookmarkClicked = onMultiBookmarkClicked,
             onMultiMarkAsReadClicked = onMultiMarkAsReadClicked,
@@ -241,6 +240,7 @@ fun MangaScreen(
             onMergeWithAnotherClicked = onMergeWithAnotherClicked,
             onOpenPagePreview = onOpenPagePreview,
             onMorePreviewsClicked = onMorePreviewsClicked,
+            previewsRowCount = previewsRowCount,
             // SY <--
             onMultiBookmarkClicked = onMultiBookmarkClicked,
             onMultiMarkAsReadClicked = onMultiMarkAsReadClicked,
@@ -296,6 +296,7 @@ private fun MangaScreenSmallImpl(
     onMergeWithAnotherClicked: () -> Unit,
     onOpenPagePreview: (Int) -> Unit,
     onMorePreviewsClicked: () -> Unit,
+    previewsRowCount: Int,
     // SY <--
 
     // For bottom action menu
@@ -532,13 +533,14 @@ private fun MangaScreenSmallImpl(
                         }
                     }
 
-                    if (state.pagePreviewsState !is PagePreviewState.Unused) {
+                    if (state.pagePreviewsState !is PagePreviewState.Unused && previewsRowCount > 0) {
                         PagePreviewItems(
                             pagePreviewState = state.pagePreviewsState,
                             onOpenPage = onOpenPagePreview,
                             onMorePreviewsClicked = onMorePreviewsClicked,
                             maxWidth = maxWidth,
                             setMaxWidth = { maxWidth = it },
+                            rowCount = previewsRowCount,
                         )
                     }
                     // SY <--
@@ -620,6 +622,7 @@ fun MangaScreenLargeImpl(
     onMergeWithAnotherClicked: () -> Unit,
     onOpenPagePreview: (Int) -> Unit,
     onMorePreviewsClicked: () -> Unit,
+    previewsRowCount: Int,
     // SY <--
 
     // For bottom action menu
@@ -820,11 +823,12 @@ fun MangaScreenLargeImpl(
                                 onMergeWithAnotherClicked = onMergeWithAnotherClicked,
                             )
                         }
-                        if (state.pagePreviewsState !is PagePreviewState.Unused) {
+                        if (state.pagePreviewsState !is PagePreviewState.Unused && previewsRowCount > 0) {
                             PagePreviews(
                                 pagePreviewState = state.pagePreviewsState,
                                 onOpenPage = onOpenPagePreview,
                                 onMorePreviewsClicked = onMorePreviewsClicked,
+                                rowCount = previewsRowCount,
                             )
                         }
                         // SY <--
@@ -962,17 +966,7 @@ private fun LazyListScope.sharedChapterItems(
                     } else {
                         item.chapter.name
                     },
-                    date = item.chapter.dateUpload
-                        .takeIf { it > 0L }
-                        ?.let {
-                            // SY -->
-                            if (manga.isEhBasedManga()) {
-                                MetadataUtil.EX_DATE_FORMAT.format(Date(it))
-                            } else {
-                                relativeDateText(Date(item.chapter.dateUpload))
-                            }
-                            // SY <--
-                        },
+                    date = relativeDateText(item.chapter.dateUpload),
                     readProgress = item.chapter.lastPageRead
                         .takeIf { /* SY --> */(!item.chapter.read || alwaysShowReadingProgress)/* SY <-- */ && it > 0L }
                         ?.let {

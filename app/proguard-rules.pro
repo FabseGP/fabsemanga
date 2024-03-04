@@ -140,10 +140,6 @@
 # XmlUtil
 -keep public enum nl.adaptivity.xmlutil.EventType { *; }
 
-# Firebase
--keep class com.google.firebase.installations.** { *; }
--keep interface com.google.firebase.installations.** { *; }
-
 # SY -->
 # SqlCipher
 -keepclassmembers class net.zetetic.database.sqlcipher.SQLiteCustomFunction { *; }

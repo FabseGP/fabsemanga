@@ -20,8 +20,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.core.view.children
-import coil.load
-import coil.transform.RoundedCornersTransformation
+import coil3.load
+import coil3.request.transformations
+import coil3.transform.RoundedCornersTransformation
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -35,7 +36,7 @@ import exh.ui.metadata.adapters.MetadataUIUtil.getResourceColor
 import exh.util.dropBlank
 import exh.util.trimOrNull
 import kotlinx.coroutines.CoroutineScope
-import tachiyomi.core.i18n.stringResource
+import tachiyomi.core.common.i18n.stringResource
 import tachiyomi.domain.manga.model.Manga
 import tachiyomi.i18n.MR
 import tachiyomi.i18n.sy.SYMR
@@ -50,6 +51,7 @@ fun EditMangaDialog(
         title: String?,
         author: String?,
         artist: String?,
+        thumbnailUrl: String?,
         description: String?,
         tags: List<String>?,
         status: Long?,
@@ -69,6 +71,7 @@ fun EditMangaDialog(
                         binding.title.text.toString(),
                         binding.mangaAuthor.text.toString(),
                         binding.mangaArtist.text.toString(),
+                        binding.thumbnailUrl.text.toString(),
                         binding.mangaDescription.text.toString(),
                         binding.mangaGenresTags.getTextStrings(),
                         binding.status.selectedItemPosition.let {
@@ -157,6 +160,7 @@ private fun onViewCreated(manga: Manga, context: Context, binding: EditMangaDial
         binding.title.hint = context.stringResource(SYMR.strings.title_hint, manga.url)
         binding.mangaAuthor.setText(manga.author.orEmpty())
         binding.mangaArtist.setText(manga.artist.orEmpty())
+        binding.thumbnailUrl.setText(manga.thumbnailUrl.orEmpty())
         binding.mangaDescription.setText(manga.description.orEmpty())
         binding.mangaGenresTags.setChips(manga.genre.orEmpty().dropBlank(), scope)
     } else {
@@ -169,26 +173,31 @@ private fun onViewCreated(manga: Manga, context: Context, binding: EditMangaDial
         if (manga.artist != manga.ogArtist) {
             binding.mangaArtist.append(manga.artist.orEmpty())
         }
+        if (manga.thumbnailUrl != manga.ogThumbnailUrl) {
+            binding.thumbnailUrl.append(manga.thumbnailUrl.orEmpty())
+        }
         if (manga.description != manga.ogDescription) {
             binding.mangaDescription.append(manga.description.orEmpty())
         }
         binding.mangaGenresTags.setChips(manga.genre.orEmpty().dropBlank(), scope)
 
         binding.title.hint = context.stringResource(SYMR.strings.title_hint, manga.ogTitle)
-        if (manga.ogAuthor != null) {
-            binding.mangaAuthor.hint = context.stringResource(SYMR.strings.author_hint, manga.ogAuthor!!)
-        }
-        if (manga.ogArtist != null) {
-            binding.mangaArtist.hint = context.stringResource(SYMR.strings.artist_hint, manga.ogArtist!!)
-        }
-        if (!manga.ogDescription.isNullOrBlank()) {
-            binding.mangaDescription.hint =
-                context.stringResource(
-                    SYMR.strings.description_hint,
-                    manga.ogDescription!!.replace("\n", " ").chop(20),
-                )
-        }
+
+        binding.mangaAuthor.hint = context.stringResource(SYMR.strings.author_hint, manga.ogAuthor ?: "")
+        binding.mangaArtist.hint = context.stringResource(SYMR.strings.artist_hint, manga.ogArtist ?: "")
+        binding.mangaDescription.hint =
+            context.stringResource(
+                SYMR.strings.description_hint,
+                manga.ogDescription?.takeIf { it.isNotBlank() }?.let { it.replace("\n", " ").chop(20) } ?: ""
+            )
     }
+    binding.thumbnailUrl.hint =
+        context.stringResource(
+            SYMR.strings.thumbnail_url_hint,
+            manga.ogThumbnailUrl?.let {
+                it.chop(40) + if (it.length > 46) "." + it.substringAfterLast(".").chop(6) else ""
+            } ?: ""
+        )
     binding.mangaGenresTags.clearFocus()
 
     binding.resetTags.setOnClickListener { resetTags(manga, binding, scope) }

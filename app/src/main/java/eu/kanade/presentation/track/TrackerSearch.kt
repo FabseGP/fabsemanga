@@ -68,7 +68,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import eu.kanade.presentation.components.DropdownMenu
 import eu.kanade.presentation.manga.components.MangaCover
-import eu.kanade.presentation.theme.TachiyomiTheme
+import eu.kanade.presentation.theme.TachiyomiPreviewTheme
 import eu.kanade.tachiyomi.data.track.model.TrackSearch
 import eu.kanade.tachiyomi.util.system.openInBrowser
 import tachiyomi.i18n.MR
@@ -301,7 +301,7 @@ private fun SearchResultItem(
                             text = status,
                         )
                     }
-                    if (trackSearch.score != -1f) {
+                    if (trackSearch.score != -1.0) {
                         SearchResultItemDetails(
                             title = stringResource(MR.strings.score),
                             text = trackSearch.score.toString(),
@@ -380,5 +380,5 @@ private fun TrackerSearchPreviews(
     @PreviewParameter(TrackerSearchPreviewProvider::class)
     content: @Composable () -> Unit,
 ) {
-    TachiyomiTheme { content() }
+    TachiyomiPreviewTheme { content() }
 }

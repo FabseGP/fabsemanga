@@ -22,7 +22,7 @@ import eu.kanade.tachiyomi.ui.reader.viewer.Viewer
 import eu.kanade.tachiyomi.ui.reader.viewer.ViewerNavigation.NavigationRegion
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
-import tachiyomi.core.util.system.logcat
+import tachiyomi.core.common.util.system.logcat
 import uy.kohesive.injekt.Injekt
 import uy.kohesive.injekt.api.get
 import uy.kohesive.injekt.injectLazy
@@ -118,7 +118,14 @@ class WebtoonViewer(
             },
         )
         recycler.tapListener = { event ->
-            val pos = PointF(event.x / recycler.width, event.y / recycler.height)
+            val viewPosition = IntArray(2)
+            recycler.getLocationOnScreen(viewPosition)
+            val viewPositionRelativeToWindow = IntArray(2)
+            recycler.getLocationInWindow(viewPositionRelativeToWindow)
+            val pos = PointF(
+                (event.rawX - viewPosition[0] + viewPositionRelativeToWindow[0]) / recycler.width,
+                (event.rawY - viewPosition[1] + viewPositionRelativeToWindow[1]) / recycler.height,
+            )
             when (config.navigator.getAction(pos)) {
                 NavigationRegion.MENU -> activity.toggleMenu()
                 NavigationRegion.NEXT, NavigationRegion.RIGHT -> scrollDown()
@@ -152,16 +159,14 @@ class WebtoonViewer(
             frame.doubleTapZoom = it
         }
 
+        config.zoomPropertyChangedListener = {
+            frame.zoomOutDisabled = it
+        }
+
         config.navigationModeChangedListener = {
             val showOnStart = config.navigationOverlayOnStart || config.forceNavigationOverlay
             activity.binding.navigationOverlay.setNavigation(config.navigator, showOnStart)
         }
-
-        // SY -->
-        config.zoomPropertyChangedListener = {
-            frame.enableZoomOut = it
-        }
-        // SY <--
 
         frame.layoutParams = ViewGroup.LayoutParams(MATCH_PARENT, MATCH_PARENT)
         frame.addView(recycler)

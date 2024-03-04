@@ -1,4 +1,4 @@
-package tachiyomi.core.metadata.tachiyomi
+package tachiyomi.core.common.metadata.tachiyomi
 
 import kotlinx.serialization.Serializable
 

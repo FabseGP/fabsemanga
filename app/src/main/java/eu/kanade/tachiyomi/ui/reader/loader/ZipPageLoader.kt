@@ -8,8 +8,8 @@ import eu.kanade.tachiyomi.ui.reader.model.ReaderPage
 import eu.kanade.tachiyomi.ui.reader.setting.ReaderPreferences
 import eu.kanade.tachiyomi.util.lang.compareToCaseInsensitiveNaturalOrder
 import eu.kanade.tachiyomi.util.storage.CbzCrypto
-import tachiyomi.core.i18n.stringResource
-import tachiyomi.core.util.system.ImageUtil
+import tachiyomi.core.common.i18n.stringResource
+import tachiyomi.core.common.util.system.ImageUtil
 import tachiyomi.i18n.sy.SYMR
 import uy.kohesive.injekt.injectLazy
 import java.io.File
@@ -37,10 +37,6 @@ internal class ZipPageLoader(file: File) : PageLoader() {
         }
 
     init {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            zip4j.charset = StandardCharsets.ISO_8859_1
-        }
-
         Zip4jFile(file).use { zip ->
             if (zip.isEncrypted) {
                 if (!CbzCrypto.checkCbzPassword(zip, CbzCrypto.getDecryptedPasswordCbz())) {

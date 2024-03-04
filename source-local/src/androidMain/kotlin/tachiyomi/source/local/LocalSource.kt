@@ -11,6 +11,10 @@ import eu.kanade.tachiyomi.source.model.SChapter
 import eu.kanade.tachiyomi.source.model.SManga
 import eu.kanade.tachiyomi.util.lang.compareToCaseInsensitiveNaturalOrder
 import eu.kanade.tachiyomi.util.storage.CbzCrypto
+import eu.kanade.tachiyomi.util.storage.CbzCrypto.addStreamToZip
+import eu.kanade.tachiyomi.util.storage.CbzCrypto.getCoverStreamFromZip
+import eu.kanade.tachiyomi.util.storage.CbzCrypto.getZipInputStream
+import eu.kanade.tachiyomi.util.storage.CbzCrypto.isEncryptedZip
 import eu.kanade.tachiyomi.util.storage.EpubFile
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -18,22 +22,20 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromStream
 import kotlinx.serialization.json.encodeToStream
 import logcat.LogPriority
-import net.lingala.zip4j.ZipFile
-import net.lingala.zip4j.model.ZipParameters
 import nl.adaptivity.xmlutil.AndroidXmlReader
 import nl.adaptivity.xmlutil.serialization.XML
-import tachiyomi.core.i18n.stringResource
-import tachiyomi.core.metadata.comicinfo.COMIC_INFO_FILE
-import tachiyomi.core.metadata.comicinfo.ComicInfo
-import tachiyomi.core.metadata.comicinfo.copyFromComicInfo
-import tachiyomi.core.metadata.comicinfo.getComicInfo
-import tachiyomi.core.metadata.tachiyomi.MangaDetails
-import tachiyomi.core.storage.UniFileTempFileManager
-import tachiyomi.core.storage.extension
-import tachiyomi.core.storage.nameWithoutExtension
-import tachiyomi.core.util.lang.withIOContext
-import tachiyomi.core.util.system.ImageUtil
-import tachiyomi.core.util.system.logcat
+import tachiyomi.core.common.i18n.stringResource
+import tachiyomi.core.common.metadata.comicinfo.COMIC_INFO_FILE
+import tachiyomi.core.common.metadata.comicinfo.ComicInfo
+import tachiyomi.core.common.metadata.comicinfo.copyFromComicInfo
+import tachiyomi.core.common.metadata.comicinfo.getComicInfo
+import tachiyomi.core.common.metadata.tachiyomi.MangaDetails
+import tachiyomi.core.common.storage.UniFileTempFileManager
+import tachiyomi.core.common.storage.extension
+import tachiyomi.core.common.storage.nameWithoutExtension
+import tachiyomi.core.common.util.lang.withIOContext
+import tachiyomi.core.common.util.system.ImageUtil
+import tachiyomi.core.common.util.system.logcat
 import tachiyomi.domain.chapter.service.ChapterRecognition
 import tachiyomi.domain.manga.model.Manga
 import tachiyomi.i18n.MR
@@ -44,7 +46,6 @@ import tachiyomi.source.local.io.Format
 import tachiyomi.source.local.io.LocalSourceFileSystem
 import tachiyomi.source.local.metadata.fillMetadata
 import uy.kohesive.injekt.injectLazy
-import java.io.File
 import java.io.InputStream
 import java.nio.charset.StandardCharsets
 import kotlin.time.Duration.Companion.days
@@ -176,8 +177,8 @@ actual class LocalSource(
 
         // Augment manga details based on metadata files
         try {
-            val mangaDir by lazy { fileSystem.getMangaDirectory(manga.url) }
-            val mangaDirFiles = fileSystem.getFilesInMangaDirectory(manga.url)
+            val mangaDir = fileSystem.getMangaDirectory(manga.url) ?: error("${manga.url} is not a valid directory")
+            val mangaDirFiles = mangaDir.listFiles().orEmpty()
 
             val comicInfoFile = mangaDirFiles
                 .firstOrNull { it.name == COMIC_INFO_FILE }
@@ -198,14 +199,10 @@ actual class LocalSource(
                 }
                 // SY -->
                 comicInfoArchiveFile != null -> {
-                    val comicInfoArchive = ZipFile(tempFileManager.createTempFile(comicInfoArchiveFile))
                     noXmlFile?.delete()
 
-                    if (CbzCrypto.checkCbzPassword(comicInfoArchive, CbzCrypto.getDecryptedPasswordCbz())) {
-                        comicInfoArchive.setPassword(CbzCrypto.getDecryptedPasswordCbz())
-                        val comicInfoEntry = comicInfoArchive.fileHeaders.firstOrNull { it.fileName == COMIC_INFO_FILE }
-                        setMangaDetailsFromComicInfoFile(comicInfoArchive.getInputStream(comicInfoEntry), manga)
-                    }
+                    comicInfoArchiveFile.getZipInputStream(COMIC_INFO_FILE)
+                        ?.let { setMangaDetailsFromComicInfoFile(it, manga) }
                 }
                 // SY <--
 
@@ -223,7 +220,7 @@ actual class LocalSource(
                     // Replace with ComicInfo.xml file
                     val comicInfo = manga.getComicInfo()
                     mangaDir
-                        ?.createFile(COMIC_INFO_FILE)
+                        .createFile(COMIC_INFO_FILE)
                         ?.openOutputStream()
                         ?.use {
                             val comicInfoString = xml.encodeToString(ComicInfo.serializer(), comicInfo)
@@ -238,22 +235,16 @@ actual class LocalSource(
                         .filter(Archive::isSupported)
                         .toList()
 
-                    val folderPath = mangaDir?.filePath
-
-                    val copiedFile = copyComicInfoFileFromArchive(chapterArchives, folderPath)
+                    val copiedFile = mangaDir?.let { copyComicInfoFileFromArchive(chapterArchives, it) }
                     // SY -->
                     if (copiedFile != null && copiedFile.name != COMIC_INFO_ARCHIVE) {
-                        setMangaDetailsFromComicInfoFile(copiedFile.inputStream(), manga)
+                        setMangaDetailsFromComicInfoFile(copiedFile.openInputStream(), manga)
                     } else if (copiedFile != null && copiedFile.name == COMIC_INFO_ARCHIVE) {
-                        val comicInfoArchive = ZipFile(copiedFile)
-                        comicInfoArchive.setPassword(CbzCrypto.getDecryptedPasswordCbz())
-                        val comicInfoEntry = comicInfoArchive.fileHeaders.firstOrNull { it.fileName == COMIC_INFO_FILE }
-
-                        setMangaDetailsFromComicInfoFile(comicInfoArchive.getInputStream(comicInfoEntry), manga)
-                    } // SY <--
+                        copiedFile.getZipInputStream(COMIC_INFO_FILE)?.let { setMangaDetailsFromComicInfoFile(it, manga) }
+                    }
                     else {
                         // Avoid re-scanning
-                        mangaDir?.createFile(".noxml")
+                        mangaDir.createFile(".noxml")
                     }
                 }
             }
@@ -264,26 +255,13 @@ actual class LocalSource(
         return@withIOContext manga
     }
 
-    private fun copyComicInfoFileFromArchive(chapterArchives: List<UniFile>, folderPath: String?): File? {
+    private fun copyComicInfoFileFromArchive(chapterArchives: List<UniFile>, folder: UniFile): UniFile? {
         for (chapter in chapterArchives) {
             when (Format.valueOf(chapter)) {
                 is Format.Zip -> {
-                    ZipFile(tempFileManager.createTempFile(chapter)).use { zip: ZipFile ->
-                        // SY -->
-                        if (zip.isEncrypted && !CbzCrypto.checkCbzPassword(zip, CbzCrypto.getDecryptedPasswordCbz())
-                        ) {
-                            return null
-                        } else if (
-                            zip.isEncrypted && CbzCrypto.checkCbzPassword(zip, CbzCrypto.getDecryptedPasswordCbz())
-                        ) {
-                            zip.setPassword(CbzCrypto.getDecryptedPasswordCbz())
-                        }
-                        zip.getFileHeader(COMIC_INFO_FILE)?.let { comicInfoFile ->
-                            // SY <--
-                            zip.getInputStream(comicInfoFile).buffered().use { stream ->
-                                return copyComicInfoFile(stream, folderPath)
-                            }
-                        }
+                    // SY -->
+                    chapter.getZipInputStream(COMIC_INFO_FILE)?.buffered().use { stream ->
+                        return stream?.let { copyComicInfoFile(it, folder) }
                     }
                 }
                 else -> {}
@@ -292,30 +270,24 @@ actual class LocalSource(
         return null
     }
 
-    private fun copyComicInfoFile(comicInfoFileStream: InputStream, folderPath: String?): File {
-        // SY -->
+    private fun copyComicInfoFile(comicInfoFileStream: InputStream, folder: UniFile): UniFile? {
         if (
             CbzCrypto.getPasswordProtectDlPref() &&
             CbzCrypto.isPasswordSet()
         ) {
-            val zipParameters = ZipParameters()
-            CbzCrypto.setZipParametersEncrypted(zipParameters)
-            zipParameters.fileNameInZip = COMIC_INFO_FILE
+            val comicInfoArchive = folder.createFile(COMIC_INFO_ARCHIVE)
+            comicInfoArchive?.addStreamToZip(comicInfoFileStream, COMIC_INFO_FILE, CbzCrypto.getDecryptedPasswordCbz())
 
-            val zipEncrypted = ZipFile("$folderPath/$COMIC_INFO_ARCHIVE")
-            zipEncrypted.setPassword(CbzCrypto.getDecryptedPasswordCbz())
-            zipEncrypted.addStream(comicInfoFileStream, zipParameters)
-            return zipEncrypted.file
+            return comicInfoArchive
         } else {
-            // SY <--
-            return File("$folderPath/$COMIC_INFO_FILE").apply {
-                outputStream().use { outputStream ->
+            return folder.createFile(COMIC_INFO_FILE)?.apply {
+                openOutputStream().use { outputStream ->
                     comicInfoFileStream.use { it.copyTo(outputStream) }
                 }
             }
         }
     }
-
+    
     private fun setMangaDetailsFromComicInfoFile(stream: InputStream, manga: SManga) {
         val comicInfo = AndroidXmlReader(stream, StandardCharsets.UTF_8.name()).use {
             xml.decodeFromReader<ComicInfo>(it)
@@ -403,19 +375,15 @@ actual class LocalSource(
                     entry?.let { coverManager.update(manga, it.openInputStream()) }
                 }
                 is Format.Zip -> {
-                    ZipFile(tempFileManager.createTempFile(format.file)).use { zip ->
-                        // SY -->
-                        var encrypted = false
-                        if (zip.isEncrypted) {
-                            zip.setPassword(CbzCrypto.getDecryptedPasswordCbz())
-                            encrypted = true
-                        }
-                        val entry = zip.fileHeaders.toList()
-                            .sortedWith { f1, f2 -> f1.fileName.compareToCaseInsensitiveNaturalOrder(f2.fileName) }
-                            .find { !it.isDirectory && ImageUtil.isImage(it.fileName) { zip.getInputStream(it) } }
-                        entry?.let { coverManager.update(manga, zip.getInputStream(it), encrypted) }
-                        // SY <--
+                    // SY -->
+                    format.file.getCoverStreamFromZip()?.let { inputStream ->
+                        coverManager.update(
+                            manga,
+                            inputStream,
+                            format.file.isEncryptedZip()
+                        )
                     }
+                    // SY <--
                 }
                 is Format.Epub -> {
                     EpubFile(tempFileManager.createTempFile(format.file)).use { epub ->

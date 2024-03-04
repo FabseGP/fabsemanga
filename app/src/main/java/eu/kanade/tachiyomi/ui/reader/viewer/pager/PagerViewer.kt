@@ -22,7 +22,7 @@ import eu.kanade.tachiyomi.ui.reader.viewer.Viewer
 import eu.kanade.tachiyomi.ui.reader.viewer.ViewerNavigation.NavigationRegion
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
-import tachiyomi.core.util.system.logcat
+import tachiyomi.core.common.util.system.logcat
 import uy.kohesive.injekt.injectLazy
 import kotlin.math.min
 
@@ -111,7 +111,14 @@ abstract class PagerViewer(val activity: ReaderActivity) : Viewer {
             // SY <--
         )
         pager.tapListener = { event ->
-            val pos = PointF(event.x / pager.width, event.y / pager.height)
+            val viewPosition = IntArray(2)
+            pager.getLocationOnScreen(viewPosition)
+            val viewPositionRelativeToWindow = IntArray(2)
+            pager.getLocationInWindow(viewPositionRelativeToWindow)
+            val pos = PointF(
+                (event.rawX - viewPosition[0] + viewPositionRelativeToWindow[0]) / pager.width,
+                (event.rawY - viewPosition[1] + viewPositionRelativeToWindow[1]) / pager.height,
+            )
             when (config.navigator.getAction(pos)) {
                 NavigationRegion.MENU -> activity.toggleMenu()
                 NavigationRegion.NEXT -> moveToNext()

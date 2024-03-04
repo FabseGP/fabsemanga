@@ -43,6 +43,7 @@ data class BackupManga(
     @ProtoNumber(600) var mergedMangaReferences: List<BackupMergedMangaReference> = emptyList(),
     @ProtoNumber(601) var flatMetadata: BackupFlatMetadata? = null,
     @ProtoNumber(602) var customStatus: Int = 0,
+    @ProtoNumber(603) var customThumbnailUrl: String? = null,
 
     // J2K specific values
     @ProtoNumber(800) var customTitle: String? = null,
@@ -54,6 +55,7 @@ data class BackupManga(
 
     // Neko specific values
     @ProtoNumber(901) var filtered_scanlators: String? = null,
+
 ) {
     fun getMangaImpl(): Manga {
         return Manga.create().copy(
@@ -62,11 +64,11 @@ data class BackupManga(
             ogTitle = this@BackupManga.title,
             ogArtist = this@BackupManga.artist,
             ogAuthor = this@BackupManga.author,
+            ogThumbnailUrl = this@BackupManga.thumbnailUrl,
             ogDescription = this@BackupManga.description,
             ogGenre = this@BackupManga.genre,
             ogStatus = this@BackupManga.status.toLong(),
             // SY <--
-            thumbnailUrl = this@BackupManga.thumbnailUrl,
             favorite = this@BackupManga.favorite,
             source = this@BackupManga.source,
             dateAdded = this@BackupManga.dateAdded,

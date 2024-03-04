@@ -25,9 +25,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import okhttp3.FormBody
 import okhttp3.Request
-import tachiyomi.core.i18n.stringResource
-import tachiyomi.core.util.lang.withIOContext
-import tachiyomi.core.util.lang.withUIContext
+import tachiyomi.core.common.i18n.stringResource
+import tachiyomi.core.common.util.lang.withIOContext
+import tachiyomi.core.common.util.lang.withUIContext
 import tachiyomi.domain.UnsortedPreferences
 import tachiyomi.domain.category.interactor.CreateCategoryWithName
 import tachiyomi.domain.category.interactor.GetCategories
@@ -106,7 +106,9 @@ class FavoritesSyncHelper(val context: Context) {
                 status.value = FavoritesSyncStatus.BadLibraryState
                     .MangaInMultipleCategories(manga, inCategories, context)
 
-                logger.w(context.stringResource(SYMR.strings.favorites_sync_gallery_multiple_categories_error, manga.id))
+                logger.w(
+                    context.stringResource(SYMR.strings.favorites_sync_gallery_multiple_categories_error, manga.id)
+                )
                 return
             } else {
                 seenManga += manga.id
@@ -450,7 +452,8 @@ sealed class FavoritesSyncStatus {
                     manga = manga,
                     categories = categories,
                     message = context.stringResource(
-                        SYMR.strings.favorites_sync_gallery_in_multiple_categories, manga.title,
+                        SYMR.strings.favorites_sync_gallery_in_multiple_categories,
+                        manga.title,
                         categories.joinToString {
                             it.name
                         },

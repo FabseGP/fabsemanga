@@ -23,8 +23,8 @@ android {
     defaultConfig {
         applicationId = "app.fabsemanga"
 
-        versionCode = 3
-        versionName = "0.1.1"
+        versionCode = 4
+        versionName = "1.0.0"
 
         buildConfigField("String", "COMMIT_COUNT", "\"${getCommitCount()}\"")
         buildConfigField("String", "COMMIT_SHA", "\"${getGitSha()}\"")
@@ -152,8 +152,8 @@ android {
 
 dependencies {
     implementation(projects.i18n)
-    implementation(project(":i18n-sy"))
-    implementation(projects.core)
+    implementation(projects.i18nSy)
+    implementation(projects.core.common)
     implementation(projects.coreMetadata)
     implementation(projects.sourceApi)
     implementation(projects.sourceLocal)
@@ -222,6 +222,7 @@ dependencies {
     // Disk
     implementation(libs.disklrucache)
     implementation(libs.unifile)
+
     // SY -->
     implementation(libs.zip4j)
     // SY <--
@@ -308,7 +309,7 @@ tasks {
             "-opt-in=androidx.compose.foundation.ExperimentalFoundationApi",
             "-opt-in=androidx.compose.animation.ExperimentalAnimationApi",
             "-opt-in=androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi",
-            "-opt-in=coil.annotation.ExperimentalCoilApi",
+            "-opt-in=coil3.annotation.ExperimentalCoilApi",
             "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",
             "-opt-in=kotlinx.coroutines.FlowPreview",
             "-opt-in=kotlinx.coroutines.InternalCoroutinesApi",
@@ -320,6 +321,10 @@ tasks {
                 "-P",
                 "plugin:androidx.compose.compiler.plugins.kotlin:reportsDestination=" +
                     project.layout.buildDirectory.dir("compose_metrics").get().asFile.absolutePath,
+            )
+            kotlinOptions.freeCompilerArgs += listOf(
+                "-P",
+                "plugin:androidx.compose.compiler.plugins.kotlin:nonSkippingGroupOptimization=true",
             )
             kotlinOptions.freeCompilerArgs += listOf(
                 "-P",

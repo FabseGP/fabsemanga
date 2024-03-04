@@ -34,10 +34,10 @@ class WebtoonFrame(context: Context) : FrameLayout(context) {
         }
 
     // SY -->
-    var enableZoomOut = false
+    var zoomOutDisabled = false
         set(value) {
             field = value
-            recycler?.canZoomOut = value
+            recycler?.zoomOutDisabled = value
         }
     // SY <--
 

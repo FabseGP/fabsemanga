@@ -9,6 +9,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import eu.kanade.domain.base.BasePreferences
+import eu.kanade.domain.chapter.interactor.SetReadStatus
 import eu.kanade.domain.chapter.model.toDbChapter
 import eu.kanade.domain.manga.interactor.SetMangaViewerFlags
 import eu.kanade.domain.manga.model.readerOrientation
@@ -72,14 +73,14 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.runBlocking
 import logcat.LogPriority
-import tachiyomi.core.preference.toggle
-import tachiyomi.core.storage.UniFileTempFileManager
-import tachiyomi.core.util.lang.launchIO
-import tachiyomi.core.util.lang.launchNonCancellable
-import tachiyomi.core.util.lang.withIOContext
-import tachiyomi.core.util.lang.withUIContext
-import tachiyomi.core.util.system.ImageUtil
-import tachiyomi.core.util.system.logcat
+import tachiyomi.core.common.preference.toggle
+import tachiyomi.core.common.storage.UniFileTempFileManager
+import tachiyomi.core.common.util.lang.launchIO
+import tachiyomi.core.common.util.lang.launchNonCancellable
+import tachiyomi.core.common.util.lang.withIOContext
+import tachiyomi.core.common.util.lang.withUIContext
+import tachiyomi.core.common.util.system.ImageUtil
+import tachiyomi.core.common.util.system.logcat
 import tachiyomi.decoder.ImageDecoder
 import tachiyomi.domain.chapter.interactor.GetChaptersByMangaId
 import tachiyomi.domain.chapter.interactor.GetMergedChaptersByMangaId
@@ -132,6 +133,7 @@ class ReaderViewModel @JvmOverloads constructor(
     private val getMergedMangaById: GetMergedMangaById = Injekt.get(),
     private val getMergedReferencesById: GetMergedReferencesById = Injekt.get(),
     private val getMergedChaptersByMangaId: GetMergedChaptersByMangaId = Injekt.get(),
+    private val setReadStatus: SetReadStatus = Injekt.get()
     // SY <--
 ) : ViewModel() {
 
@@ -397,7 +399,8 @@ class ReaderViewModel @JvmOverloads constructor(
                     loadChapter(
                         loader!!,
                         chapterList.first { chapterId == it.chapter.id },
-                        /* SY --> */page, /* SY <-- */
+                        /* SY --> */
+                        page, /* SY <-- */
                     )
                     Result.success(true)
                 } else {
@@ -533,7 +536,8 @@ class ReaderViewModel @JvmOverloads constructor(
             val isDownloaded = downloadManager.isChapterDownloaded(
                 dbChapter.name,
                 dbChapter.scanlator,
-                /* SY --> */ manga.ogTitle /* SY <-- */,
+                /* SY --> */
+                manga.ogTitle /* SY <-- */,
                 manga.source,
                 skipCache = true,
             )
@@ -696,6 +700,16 @@ class ReaderViewModel @JvmOverloads constructor(
                 // SY <--
                 readerChapter.chapter.read = true
                 // SY -->
+                if (readerChapter.chapter.chapter_number > 0 && readerPreferences.markReadDupe().get()) {
+                    getChaptersByMangaId.await(manga!!.id).sortedByDescending { it.sourceOrder }
+                        .filter {
+                            it.id != readerChapter.chapter.id &&
+                                !it.read &&
+                                it.chapterNumber.toFloat() == readerChapter.chapter.chapter_number
+                        }
+                        .ifEmpty { null }
+                        ?.also { setReadStatus.await(true, *it.toTypedArray()) }
+                }
                 if (manga?.isEhBasedManga() == true) {
                     viewModelScope.launchNonCancellable {
                         val chapterUpdates = chapterList

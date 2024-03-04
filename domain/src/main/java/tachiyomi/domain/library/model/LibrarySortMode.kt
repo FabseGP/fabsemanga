@@ -81,7 +81,8 @@ data class LibrarySort(
                 Type.ChapterFetchDate,
                 Type.DateAdded,
                 Type.TrackerMean,
-                /* SY -->*/ Type.TagList, /* SY <--*/
+                /* SY -->*/
+                Type.TagList, /* SY <--*/
             )
         }
         val directions by lazy { setOf(Direction.Ascending, Direction.Descending) }

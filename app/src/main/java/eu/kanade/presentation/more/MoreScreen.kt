@@ -11,10 +11,10 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Label
 import androidx.compose.material.icons.outlined.CloudOff
-import androidx.compose.material.icons.outlined.Extension
 import androidx.compose.material.icons.outlined.GetApp
 import androidx.compose.material.icons.outlined.History
 import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.outlined.Label
 import androidx.compose.material.icons.outlined.NewReleases
 import androidx.compose.material.icons.outlined.QueryStats
 import androidx.compose.material.icons.outlined.Settings
@@ -54,11 +54,8 @@ fun MoreScreen(
     onClickDataAndStorage: () -> Unit,
     onClickSettings: () -> Unit,
     onClickAbout: () -> Unit,
-    // SY -->
     onClickUpdates: () -> Unit,
     onClickHistory: () -> Unit,
-    onClickRepos: () -> Unit,
-    // SY <--
 ) {
     val uriHandler = LocalUriHandler.current
 
@@ -159,15 +156,6 @@ fun MoreScreen(
                     onPreferenceClick = onClickDownloadQueue,
                 )
             }
-            // SY -->
-            item {
-                TextPreferenceWidget(
-                    title = stringResource(MR.strings.label_extension_repos),
-                    icon = Icons.Outlined.Extension,
-                    onPreferenceClick = onClickRepos,
-                )
-            }
-            // SY <--
             item {
                 TextPreferenceWidget(
                     title = stringResource(MR.strings.categories),
